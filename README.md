@@ -75,7 +75,8 @@ Automatically generates release notes when a GitHub release is published.
 **Auto-detected:**
 - Title: `"Release notes for {tag_name}"`
 - Body: Release description
-- Changes: Commits in the release
+
+Release event payload does not specify an explicit changeset. To target specific commits or releases, use the [Changeset Specification](#changeset-specification) inputs.
 
 ### Pull Request Merged
 
@@ -91,7 +92,8 @@ Automatically generates documentation when a PR is merged.
 **Auto-detected:**
 - Title: `"Documentation for PR #{number}: {title}"`
 - Body: PR description
-- Changes: PR commits
+
+PR merge events do not automatically include an explicit changeset. To control which commits are documented, use the [Changeset Specification](#changeset-specification) inputs.
 
 ### Manual
 
