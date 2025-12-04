@@ -38,8 +38,9 @@ export async function run(): Promise<void> {
     // Step 4: Build changes array if changeset inputs provided
     let changes: any[] | undefined;
     if (inputs.changeset) {
-      changes = buildChanges(inputs.changeset);
-      if (changes.length > 0) {
+      const builtChanges = buildChanges(inputs.changeset);
+      if (builtChanges.length > 0) {
+        changes = builtChanges;
         core.info('Changeset specification added to request');
         core.warning('Changeset inputs override any commits specified in body');
       }
@@ -99,4 +100,7 @@ export async function run(): Promise<void> {
   }
 }
 
-run();
+// Only run if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  run();
+}
