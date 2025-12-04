@@ -1,0 +1,1 @@
+{"version":3,"file":"api.d.ts","sourceRoot":"","sources":["../src/api.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,iBAAiB,EAAE,kBAAkB,EAAE,MAAM,SAAS,CAAC;AAMhE;;GAEG;AACH,wBAAsB,SAAS,CAC7B,QAAQ,EAAE,MAAM,EAChB,OAAO,EAAE,iBAAiB,GACzB,OAAO,CAAC,kBAAkB,CAAC,CA+D7B;AAED;;GAEG;AACH,wBAAgB,eAAe,CAAC,KAAK,EAAE,MAAM,GAAG,MAAM,CAErD"}

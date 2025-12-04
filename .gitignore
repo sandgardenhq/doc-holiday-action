@@ -5,7 +5,6 @@ yarn-error.log
 
 # TypeScript
 *.tsbuildinfo
-dist/
 lib/
 
 # IDEs
