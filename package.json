@@ -6,6 +6,8 @@
   "scripts": {
     "build": "tsc",
     "package": "ncc build dist/index.js -o dist --source-map --license licenses.txt",
+    "package:jira": "ncc build dist/load-jira-issues/index.js -o dist/load-jira-issues --source-map --license licenses.txt",
+    "package:all": "npm run package && npm run package:jira",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
