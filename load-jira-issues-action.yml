@@ -1,0 +1,88 @@
+# load-jira-issues-action.yml
+name: 'Load JIRA Issues'
+description: 'Extract JIRA issue references from Git commits for use in downstream actions'
+author: 'Sandgarden'
+
+branding:
+  icon: 'link'
+  color: 'blue'
+
+inputs:
+  jira-base-url:
+    description: 'JIRA instance URL (e.g., https://company.atlassian.net)'
+    required: true
+
+  jira-api-token:
+    description: 'JIRA API token (store in GitHub secrets)'
+    required: true
+
+  jira-user-email:
+    description: 'Email for JIRA Cloud auth (required for Cloud, ignored for Data Center)'
+    required: false
+
+  project-keys:
+    description: 'Comma-separated JIRA project keys to filter (default: all projects)'
+    required: false
+
+  output-file:
+    description: 'Output JSON file path'
+    required: false
+    default: 'jira-issues.json'
+
+  releases-count:
+    description: 'Number of recent releases to include'
+    required: false
+
+  time-range-start:
+    description: 'Time range start (ISO 8601 timestamp)'
+    required: false
+
+  time-range-end:
+    description: 'Time range end (ISO 8601 timestamp)'
+    required: false
+
+  commits-count:
+    description: 'Number of recent commits'
+    required: false
+
+  commits-since-sha:
+    description: 'Start from specific commit SHA'
+    required: false
+
+  commits-shas:
+    description: 'Comma-separated list of specific commit SHAs'
+    required: false
+
+  commits-start-sha:
+    description: 'Commit range start SHA'
+    required: false
+
+  commits-end-sha:
+    description: 'Commit range end SHA'
+    required: false
+
+  commits-include-start:
+    description: 'Include start commit in range (true/false)'
+    required: false
+
+  tags-start:
+    description: 'Start tag'
+    required: false
+
+  tags-end:
+    description: 'End tag'
+    required: false
+
+outputs:
+  issue-links:
+    description: 'Comma-separated JIRA issue browse URLs'
+
+  issue-keys:
+    description: 'Comma-separated JIRA issue keys'
+
+  issue-count:
+    description: 'Number of unique JIRA issues found'
+
+runs:
+  using: 'node20'
+  main: 'dist/load-jira-issues/index.js'
