@@ -400,3 +400,153 @@ MIT License - see LICENSE file for details.
 
 - [doc.holiday Documentation](https://doc.holiday/docs)
 - [GitHub Issues](https://github.com/sandgardenhq/doc-holiday-action/issues)
+
+---
+
+# Load JIRA Issues Action
+
+Extract JIRA issue references from Git commits for use in downstream actions.
+
+## Quick Start
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+
+- name: Load JIRA Issues
+  id: jira
+  uses: sandgardenhq/load-jira-issues@v1
+  with:
+    jira-base-url: https://company.atlassian.net
+    jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+    jira-user-email: user@company.com
+    commits-count: 50
+
+- name: Generate Docs with JIRA Links
+  uses: sandgardenhq/doc-holiday-action@v1
+  with:
+    api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
+    event-type: release
+    relevant-links: ${{ steps.jira.outputs.issue-links }}
+```
+
+## Inputs
+
+### Required
+
+| Input | Description |
+|-------|-------------|
+| `jira-base-url` | JIRA instance URL (e.g., `https://company.atlassian.net`) |
+| `jira-api-token` | JIRA API token (store in GitHub secrets) |
+
+### Conditional
+
+| Input | Description |
+|-------|-------------|
+| `jira-user-email` | Required for JIRA Cloud (*.atlassian.net), ignored for Data Center |
+
+### Optional
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `project-keys` | Comma-separated JIRA project keys to filter | (all projects) |
+| `output-file` | JSON artifact path | `jira-issues.json` |
+
+### Changeset Specification (one required)
+
+Same changeset options as doc-holiday-action. Only one type can be used at a time.
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| `issue-links` | Comma-separated JIRA browse URLs |
+| `issue-keys` | Comma-separated JIRA issue keys |
+| `issue-count` | Number of unique issues found |
+
+## Prerequisites
+
+- `actions/checkout` must run before this action
+- `fetch-depth: 0` recommended for tag/commit range queries
+
+## Usage Examples
+
+### Extract Issues from Last 50 Commits
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+
+- name: Load JIRA Issues
+  id: jira
+  uses: sandgardenhq/load-jira-issues@v1
+  with:
+    jira-base-url: ${{ secrets.JIRA_BASE_URL }}
+    jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+    jira-user-email: ${{ secrets.JIRA_USER_EMAIL }}
+    commits-count: 50
+
+- name: Display Found Issues
+  run: |
+    echo "Found issues: ${{ steps.jira.outputs.issue-keys }}"
+    echo "Total count: ${{ steps.jira.outputs.issue-count }}"
+```
+
+### Filter by Specific Projects
+
+```yaml
+- uses: sandgardenhq/load-jira-issues@v1
+  with:
+    jira-base-url: https://company.atlassian.net
+    jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+    jira-user-email: user@company.com
+    project-keys: PROJ,INFRA,OPS
+    commits-count: 50
+```
+
+### Extract from Release Tag Range
+
+```yaml
+- uses: sandgardenhq/load-jira-issues@v1
+  with:
+    jira-base-url: https://company.atlassian.net
+    jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+    jira-user-email: user@company.com
+    tags-start: v1.0.0
+    tags-end: v1.1.0
+```
+
+### Combined with doc-holiday-action
+
+```yaml
+name: Release with JIRA Links
+on:
+  release:
+    types: [published]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract JIRA Issues
+        id: jira
+        uses: sandgardenhq/load-jira-issues@v1
+        with:
+          jira-base-url: ${{ secrets.JIRA_BASE_URL }}
+          jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+          jira-user-email: ${{ secrets.JIRA_USER_EMAIL }}
+          releases-count: 1
+
+      - name: Generate Release Notes
+        uses: sandgardenhq/doc-holiday-action@v1
+        with:
+          api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
+          event-type: release
+          relevant-links: ${{ steps.jira.outputs.issue-links }}
+```
