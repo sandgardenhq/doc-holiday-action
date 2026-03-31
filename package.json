@@ -1,6 +1,6 @@
 {
   "name": "doc-holiday-action",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "GitHub Action to automatically generate release notes and documentation using doc.holiday",
   "main": "dist/index.js",
   "scripts": {
