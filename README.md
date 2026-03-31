@@ -14,7 +14,7 @@ Version 2 uses the Work States API with a simplified input model centered on nat
 
 ## Quick Start
 
-Doc Holiday Action v2 sends a natural-language documentation request to the Work States API. The main breaking change from v1 is the move away from the Jobs API, along with fewer required inputs and richer outputs.
+Doc Holiday Action v2 sends natural-language documentation requests to the Work States API. The main breaking change from v1 is the move away from the Jobs API, along with fewer required inputs and richer outputs.
 
 ### 1. Get Your API Token
 
