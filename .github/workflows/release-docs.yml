@@ -4,24 +4,7 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      event-type:
-        description: 'Event type to simulate'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - release
-          - pull_request
-      tag-name:
-        description: 'Release tag name (for release events)'
-        required: false
-        type: string
-      pr-number:
-        description: 'Pull request number (for PR events)'
-        required: false
-        type: string
-
+  
 jobs:
   generate-docs:
     runs-on: ubuntu-latest
@@ -30,4 +13,4 @@ jobs:
         uses: sandgardenhq/doc-holiday-action@v2
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-          event-type: ${{ github.event.inputs.event-type || 'release' }}
+          event-type: 'release'
