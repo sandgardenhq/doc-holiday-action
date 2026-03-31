@@ -48,7 +48,7 @@ jobs:
 | Input | Description |
 |-------|-------------|
 | `api-token` | Doc.holiday API token (store in GitHub secrets) |
-| `body` | Natural language request describing what you want written |
+| `body` | Natural language request to Doc Holiday for what you want written |
 
 ### Optional
 
@@ -67,7 +67,7 @@ Specify changes explicitly. **Only one type can be used at a time.**
 
 | Input | Description |
 |-------|-------------|
-| `releases-count` | Number of recent releases |
+| `releases-count` | Number of recent releases to include |
 
 ```yaml
 releases-count: 2
@@ -109,7 +109,7 @@ commits-since-sha: 'abc123def456'
 
 | Input | Description |
 |-------|-------------|
-| `commits-shas` | Comma-separated SHAs |
+| `commits-shas` | Comma-separated list of specific commit SHAs |
 
 ```yaml
 commits-shas: 'abc123,def456,789ghi'
@@ -119,9 +119,9 @@ commits-shas: 'abc123,def456,789ghi'
 
 | Input | Description |
 |-------|-------------|
-| `commits-start-sha` | Range start SHA |
-| `commits-end-sha` | Range end SHA |
-| `commits-include-start` | Include start commit (`true`/`false`) |
+| `commits-start-sha` | Commit range start SHA |
+| `commits-end-sha` | Commit range end SHA |
+| `commits-include-start` | Include start commit in range (`true`/`false`) |
 
 ```yaml
 commits-start-sha: 'abc123'
@@ -134,7 +134,7 @@ commits-include-start: true
 | Input | Description |
 |-------|-------------|
 | `tags-start` | Start tag |
-| `tags-end` | End tag (optional) |
+| `tags-end` | End tag |
 
 ```yaml
 tags-start: 'v1.0.0'
