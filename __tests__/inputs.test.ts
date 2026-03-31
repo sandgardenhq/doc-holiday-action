@@ -5,13 +5,11 @@ import { parseInputs } from '../src/inputs';
 jest.mock('@actions/core');
 
 const mockGetInput = core.getInput as jest.MockedFunction<typeof core.getInput>;
-const mockGetBooleanInput = core.getBooleanInput as jest.MockedFunction<typeof core.getBooleanInput>;
 
 describe('parseInputs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetInput.mockReturnValue('');
-    mockGetBooleanInput.mockReturnValue(false);
   });
 
   describe('required inputs', () => {
