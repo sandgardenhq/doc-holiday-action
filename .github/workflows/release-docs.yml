@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate release notes with Doc Holiday
-        uses: sandgardenhq/doc-holiday-action@v1.0.1
+        uses: sandgardenhq/doc-holiday-action@v2
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
           event-type: release
