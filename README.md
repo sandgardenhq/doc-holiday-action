@@ -2,14 +2,19 @@
 
 Automatically generate release notes and documentation updates using [doc.holiday](https://doc.holiday).
 
+Version 2 uses the Work States API with a simplified input model centered on natural-language requests and expanded work-state outputs.
+
 ## Features
 
 - **Automatic Documentation**: Generate docs from natural language requests
+- **Work States API**: Create documentation work through the v2 Work States API model
 - **Comprehensive Changeset Support**: All 8 changeset specification types from doc.holiday API
 - **Fire-and-Forget**: Non-blocking workflow execution
 - **Built-in Retry Logic**: Handles rate limits and network failures
 
 ## Quick Start
+
+Doc Holiday Action v2 sends a natural-language documentation request to the Work States API. The main breaking change from v1 is the move away from the Jobs API, along with fewer required inputs and richer outputs.
 
 ### 1. Get Your API Token
 
@@ -52,7 +57,7 @@ jobs:
 | `publication` | Publication ID or name |
 | `stage` | If true, work does not immediately result in an opened PR |
 | `labels` | Comma-separated labels |
-| `relevant-links` | Comma-separated URLs for context |
+| `relevant-links` | Comma-separated URLs for additional context |
 
 ### Changeset Specification
 
@@ -162,6 +167,8 @@ tags-end: 'v1.1.0'
 
 ### Using Outputs
 
+These outputs come from the created work state. They replace older job-oriented outputs such as job URL and job state.
+
 ```yaml
 - name: Create Documentation
   id: doc-holiday
@@ -183,6 +190,8 @@ tags-end: 'v1.1.0'
 
 ### PR Merge Documentation
 
+GitHub event data can still be used in the workflow to build the `body` input explicitly, but v2 does not auto-detect or infer request fields from the event payload.
+
 ```yaml
 name: Update Docs on Merge
 on:
@@ -200,6 +209,27 @@ jobs:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
           body: "Document changes from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
           publication: my-docs
+          commits-count: 20
+```
+
+### Release-Triggered Documentation
+
+```yaml
+name: Release Documentation
+on:
+  release:
+    types: [published]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sandgardenhq/doc-holiday-action@v2
+        with:
+          api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
+          body: "Generate release notes for the latest release"
+          releases-count: 1
+          labels: release,automated
 ```
 
 ### Weekly Scheduled Updates
@@ -234,6 +264,14 @@ jobs:
 ```
 
 ## Troubleshooting
+
+### v2 Migration Notes
+
+- Use `body` for the natural-language request.
+- Use `publication` instead of `publications`.
+- Use `stage` when work should be prepared without immediately opening a PR.
+- Do not use removed v1 inputs such as `event-type`, `title`, `source-connection`, or `comments`.
+- Read work-state outputs such as `id`, `status`, `branch`, and `output-url` instead of deprecated job-oriented outputs.
 
 ### Authentication Error (401)
 
