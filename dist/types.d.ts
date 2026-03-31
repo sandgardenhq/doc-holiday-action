@@ -1,21 +1,12 @@
-/**
- * Parsed and validated action inputs
- */
 export interface ActionInputs {
     apiToken: string;
-    eventType?: 'release' | 'merge' | 'custom';
-    title?: string;
-    body?: string;
-    publications?: string[];
-    sourceConnection?: string;
+    body: string;
+    publication?: string;
+    stage?: boolean;
     labels?: string[];
-    comments?: string[];
     relevantLinks?: string[];
     changeset?: ChangesetInput;
 }
-/**
- * Changeset specification from action inputs
- */
 export interface ChangesetInput {
     releasesCount?: number;
     timeRangeStart?: string;
@@ -29,46 +20,39 @@ export interface ChangesetInput {
     tagsStart?: string;
     tagsEnd?: string;
 }
-/**
- * Smart defaults generated from GitHub event context
- */
-export interface SmartDefaults {
-    title: string;
+export interface WorkStateRequest {
     body: string;
-    eventType?: 'release' | 'merge';
+    publication?: string;
+    stage?: boolean;
+    labels?: string[];
+    relevantLinks?: string[];
     changes?: any[];
 }
-/**
- * Doc.holiday API request body
- */
-export interface DocHolidayRequest {
-    docRequest: {
-        title: string;
-        body: string;
-        sourceConnection: string;
-        publications?: string[];
-        labels?: string[];
-        comments?: string[];
-        relevantLinks?: string[];
-        eventType?: 'release' | 'merge';
-        changes?: any[];
-    };
-}
-/**
- * Doc.holiday API response
- */
-export interface DocHolidayResponse {
+export interface WorkStateEntry {
     id: string;
-    orgId: string;
-    type: string;
-    state: 'requested' | 'running' | 'done' | 'errored';
+    createdAt: string;
+    status: string;
+    message: string;
 }
-/**
- * Action outputs
- */
-export interface ActionOutputs {
+export interface WorkStateResponse {
+    id: string;
     jobId: string;
-    jobState: string;
-    jobUrl: string;
+    outId: string;
+    orgId: string;
+    status: string;
+    publicationId: string;
+    connectionId: string;
+    publicationName: string;
+    triggerType: string;
+    operationType: string;
+    createdAt: string;
+    updatedAt: string;
+    branch: string;
+    title: string;
+    summary: string;
+    outputUrl: string;
+    staged: boolean;
+    excludedFiles: string[];
+    entries: WorkStateEntry[];
 }
 //# sourceMappingURL=types.d.ts.map

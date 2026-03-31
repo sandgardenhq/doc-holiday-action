@@ -36,61 +36,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseInputs = parseInputs;
 // src/inputs.ts
 const core = __importStar(require("@actions/core"));
-/**
- * Parse and validate all action inputs
- */
 function parseInputs() {
     const apiToken = core.getInput('api-token', { required: true });
-    const eventTypeRaw = core.getInput('event-type');
-    const eventType = (eventTypeRaw || undefined);
-    // Manual mode inputs
-    const title = core.getInput('title');
     const body = core.getInput('body');
-    const publicationsInput = core.getInput('publications');
-    const sourceConnection = core.getInput('source-connection');
+    const publicationInput = core.getInput('publication');
+    const stageInput = core.getInput('stage');
     const labelsInput = core.getInput('labels');
-    const commentsInput = core.getInput('comments');
     const relevantLinksInput = core.getInput('relevant-links');
-    // Parse comma-separated inputs
-    const publications = publicationsInput
-        ? publicationsInput.split(',').map(p => p.trim()).filter(Boolean)
-        : undefined;
+    if (!body) {
+        throw new Error('body is required');
+    }
     const labels = labelsInput
         ? labelsInput.split(',').map(l => l.trim()).filter(Boolean)
-        : undefined;
-    const comments = commentsInput
-        ? commentsInput.split('\n').map(c => c.trim()).filter(Boolean)
         : undefined;
     const relevantLinks = relevantLinksInput
         ? relevantLinksInput.split(',').map(l => l.trim()).filter(Boolean)
         : undefined;
-    // Parse changeset inputs
     const changeset = parseChangesetInputs();
-    // Validate manual mode requirements
-    if (!eventType || eventType === 'custom') {
-        if (!title) {
-            throw new Error('title is required when event-type is not set or is "custom"');
-        }
-        if (!body) {
-            throw new Error('body is required when event-type is not set or is "custom"');
-        }
-    }
     return {
         apiToken,
-        eventType,
-        title: title || undefined,
-        body: body || undefined,
-        publications,
-        sourceConnection: sourceConnection || undefined,
+        body,
+        publication: publicationInput || undefined,
+        stage: stageInput ? stageInput === 'true' : undefined,
         labels,
-        comments,
         relevantLinks,
         changeset,
     };
 }
-/**
- * Parse changeset specification inputs
- */
 function parseChangesetInputs() {
     const releasesCount = core.getInput('releases-count');
     const timeRangeStart = core.getInput('time-range-start');
@@ -103,7 +75,6 @@ function parseChangesetInputs() {
     const commitsIncludeStart = core.getInput('commits-include-start');
     const tagsStart = core.getInput('tags-start');
     const tagsEnd = core.getInput('tags-end');
-    // Check if any changeset inputs are provided
     const hasAnyChangesetInput = [
         releasesCount,
         timeRangeStart,
@@ -116,7 +87,6 @@ function parseChangesetInputs() {
     if (!hasAnyChangesetInput) {
         return undefined;
     }
-    // Validate mutual exclusivity
     const specifiedTypes = [
         releasesCount && 'releases-count',
         timeRangeStart && 'time-range',
