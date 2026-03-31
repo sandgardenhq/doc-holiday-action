@@ -1,102 +1,69 @@
 // src/index.ts
 import * as core from '@actions/core';
 import { parseInputs } from './inputs';
-import { getSmartDefaults, inferSourceConnection } from './github-context';
 import { buildChanges } from './changes';
-import { createJob, constructJobUrl } from './api';
-import { DocHolidayRequest } from './types';
+import { createWorkState } from './api';
+import { WorkStateRequest } from './types';
 
 export async function run(): Promise<void> {
   try {
     core.info('Starting doc.holiday GitHub Action...');
 
-    // Step 1: Parse inputs
     const inputs = parseInputs();
-    core.info('Inputs parsed and validated successfully');
+    core.info('Inputs parsed successfully');
 
-    // Step 2: Determine title, body, eventType, and changes from smart defaults
-    let title = inputs.title;
-    let body = inputs.body;
-    let eventType = inputs.eventType;
-    let smartChanges: any[] | undefined;
-
-    if (inputs.eventType === 'release' || inputs.eventType === 'merge') {
-      core.info(`Smart mode: ${inputs.eventType}`);
-      const smartDefaults = getSmartDefaults(inputs.eventType);
-      title = smartDefaults.title;
-      body = smartDefaults.body;
-      eventType = smartDefaults.eventType;
-      smartChanges = smartDefaults.changes;
-    }
-
-    if (!title || !body) {
-      throw new Error('Title and body are required');
-    }
-
-    // Step 3: Infer source connection if not provided
-    const sourceConnection = inputs.sourceConnection || inferSourceConnection();
-    core.info(`Source connection: ${sourceConnection}`);
-
-    // Step 4: Build changes array - prioritize manual inputs, then smart defaults
-    let changes: any[] | undefined;
-    if (inputs.changeset) {
-      const builtChanges = buildChanges(inputs.changeset);
-      if (builtChanges.length > 0) {
-        changes = builtChanges;
-        core.info('Changeset specification added to request');
-        core.warning('Changeset inputs override any commits specified in body');
-      }
-    } else if (smartChanges && smartChanges.length > 0) {
-      // Use changes from smart defaults if no manual changeset provided
-      changes = smartChanges;
-      core.info('Using smart default changeset specification');
-    }
-
-    // Step 5: Build API request
-    const request: DocHolidayRequest = {
-      docRequest: {
-        title,
-        body,
-        sourceConnection,
-      },
+    const request: WorkStateRequest = {
+      body: inputs.body,
     };
 
-    // Add optional fields
-    if (inputs.publications) {
-      request.docRequest.publications = inputs.publications;
+    if (inputs.publication) {
+      request.publication = inputs.publication;
+    }
+    if (inputs.stage !== undefined) {
+      request.stage = inputs.stage;
     }
     if (inputs.labels) {
-      request.docRequest.labels = inputs.labels;
-    }
-    if (inputs.comments) {
-      request.docRequest.comments = inputs.comments;
+      request.labels = inputs.labels;
     }
     if (inputs.relevantLinks) {
-      request.docRequest.relevantLinks = inputs.relevantLinks;
-    }
-    if (eventType && eventType !== 'custom') {
-      request.docRequest.eventType = eventType;
-    }
-    if (changes) {
-      request.docRequest.changes = changes;
+      request.relevantLinks = inputs.relevantLinks;
     }
 
-    core.info('API request constructed');
+    if (inputs.changeset) {
+      const changes = buildChanges(inputs.changeset);
+      if (changes.length > 0) {
+        request.changes = changes;
+        core.info('Changeset specification added to request');
+      }
+    }
 
-    // Step 6: Create job
-    const response = await createJob(inputs.apiToken, request);
+    core.info('Creating work state...');
+    const response = await createWorkState(inputs.apiToken, request);
 
-    // Step 7: Set outputs
-    const jobUrl = constructJobUrl(response.id);
+    // Set all outputs
+    core.setOutput('id', response.id);
+    core.setOutput('job-id', response.jobId);
+    core.setOutput('out-id', response.outId);
+    core.setOutput('org-id', response.orgId);
+    core.setOutput('status', response.status);
+    core.setOutput('publication-id', response.publicationId);
+    core.setOutput('connection-id', response.connectionId);
+    core.setOutput('publication-name', response.publicationName);
+    core.setOutput('trigger-type', response.triggerType);
+    core.setOutput('operation-type', response.operationType);
+    core.setOutput('created-at', response.createdAt);
+    core.setOutput('updated-at', response.updatedAt);
+    core.setOutput('branch', response.branch);
+    core.setOutput('title', response.title);
+    core.setOutput('summary', response.summary);
+    core.setOutput('output-url', response.outputUrl);
+    core.setOutput('staged', String(response.staged));
+    core.setOutput('excluded-files', JSON.stringify(response.excludedFiles));
+    core.setOutput('entries', JSON.stringify(response.entries));
 
-    core.setOutput('job-id', response.id);
-    core.setOutput('job-state', response.state);
-    core.setOutput('job-url', jobUrl);
-
-    core.info('✓ Action completed successfully!');
-    core.info(`Job ID: ${response.id}`);
-    core.info(`Job State: ${response.state}`);
-    core.info(`View job: ${jobUrl}`);
+    core.info('Action completed successfully!');
+    core.info(`Work State ID: ${response.id}`);
+    core.info(`Status: ${response.status}`);
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);
@@ -106,7 +73,6 @@ export async function run(): Promise<void> {
   }
 }
 
-// Only run if not in test environment
 if (process.env.NODE_ENV !== 'test') {
   run();
 }

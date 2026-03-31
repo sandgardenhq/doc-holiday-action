@@ -11,33 +11,20 @@ inputs:
     description: 'Doc.holiday API token (store in GitHub secrets)'
     required: true
 
-  event-type:
-    description: 'Event type: release, merge, or custom (default: custom)'
-    required: false
-    default: 'custom'
-
-  title:
-    description: 'Job title (required in manual/custom mode)'
-    required: false
-
   body:
-    description: 'Natural language request or commit specification (required in manual/custom mode)'
+    description: 'Natural language request to Doc Holiday for what you want written'
+    required: true
+
+  publication:
+    description: 'Publication ID or name'
     required: false
 
-  publications:
-    description: 'Comma-separated publication names/IDs'
-    required: false
-
-  source-connection:
-    description: 'Connection name/ID (defaults to current repository owner/repo)'
+  stage:
+    description: 'If true, work does not immediately result in an opened PR'
     required: false
 
   labels:
     description: 'Comma-separated labels'
-    required: false
-
-  comments:
-    description: 'Additional instructions (multiline supported)'
     required: false
 
   relevant-links:
@@ -89,14 +76,62 @@ inputs:
     required: false
 
 outputs:
+  id:
+    description: 'Work state ID'
+
   job-id:
-    description: 'The doc.holiday job ID'
+    description: 'Associated job ID'
 
-  job-state:
-    description: 'Job state from creation response (typically "requested")'
+  out-id:
+    description: 'Output identifier'
 
-  job-url:
-    description: 'URL to view job in doc.holiday UI'
+  org-id:
+    description: 'Organization ID'
+
+  status:
+    description: 'Work state status (requested, running, done, errored)'
+
+  publication-id:
+    description: 'Publication ID'
+
+  connection-id:
+    description: 'Connection ID'
+
+  publication-name:
+    description: 'Publication name'
+
+  trigger-type:
+    description: 'Trigger type'
+
+  operation-type:
+    description: 'Operation type'
+
+  created-at:
+    description: 'Creation timestamp (RFC3339)'
+
+  updated-at:
+    description: 'Last update timestamp (RFC3339)'
+
+  branch:
+    description: 'Branch name'
+
+  title:
+    description: 'Title'
+
+  summary:
+    description: 'Summary'
+
+  output-url:
+    description: 'Output URL'
+
+  staged:
+    description: 'Whether the work state is staged'
+
+  excluded-files:
+    description: 'JSON array of excluded file paths'
+
+  entries:
+    description: 'JSON array of work history entries'
 
 runs:
   using: 'node20'

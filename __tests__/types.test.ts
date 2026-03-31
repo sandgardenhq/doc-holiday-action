@@ -1,163 +1,79 @@
 // __tests__/types.test.ts
-
 import {
   ActionInputs,
   ChangesetInput,
-  SmartDefaults,
-  DocHolidayRequest,
-  DocHolidayResponse,
-  ActionOutputs
+  WorkStateRequest,
+  WorkStateResponse,
+  WorkStateEntry,
 } from '../src/types';
 
-describe('TypeScript Type Definitions', () => {
-  describe('ActionInputs', () => {
-    it('should compile with required fields', () => {
-      const input: ActionInputs = {
-        apiToken: 'test-token'
-      };
-      expect(input.apiToken).toBe('test-token');
-    });
-
-    it('should compile with all optional fields', () => {
-      const input: ActionInputs = {
-        apiToken: 'test-token',
-        eventType: 'release',
-        title: 'Test Release',
-        body: 'Release notes',
-        publications: ['pub1', 'pub2'],
-        sourceConnection: 'github',
-        labels: ['label1'],
-        comments: ['comment1'],
-        relevantLinks: ['https://example.com'],
-        changeset: {
-          releasesCount: 5
-        }
-      };
-      expect(input.eventType).toBe('release');
-      expect(input.publications).toHaveLength(2);
-    });
+describe('types', () => {
+  it('ActionInputs should not have title, eventType, sourceConnection, or comments', () => {
+    const inputs: ActionInputs = {
+      apiToken: 'token',
+      body: 'test',
+    };
+    expect(inputs).not.toHaveProperty('title');
+    expect(inputs).not.toHaveProperty('eventType');
+    expect(inputs).not.toHaveProperty('sourceConnection');
+    expect(inputs).not.toHaveProperty('comments');
+    expect(inputs).not.toHaveProperty('publications');
   });
 
-  describe('ChangesetInput', () => {
-    it('should compile with release-based changeset', () => {
-      const changeset: ChangesetInput = {
-        releasesCount: 3,
-        timeRangeStart: '2024-01-01',
-        timeRangeEnd: '2024-12-31'
-      };
-      expect(changeset.releasesCount).toBe(3);
-    });
-
-    it('should compile with commit-based changeset', () => {
-      const changeset: ChangesetInput = {
-        commitsCount: 10,
-        commitsSinceSha: 'abc123',
-        commitsShas: ['sha1', 'sha2'],
-        commitsStartSha: 'start-sha',
-        commitsEndSha: 'end-sha',
-        commitsIncludeStart: true
-      };
-      expect(changeset.commitsCount).toBe(10);
-      expect(changeset.commitsShas).toHaveLength(2);
-    });
-
-    it('should compile with tag-based changeset', () => {
-      const changeset: ChangesetInput = {
-        tagsStart: 'v1.0.0',
-        tagsEnd: 'v2.0.0'
-      };
-      expect(changeset.tagsStart).toBe('v1.0.0');
-    });
+  it('ActionInputs should have publication (singular) and stage', () => {
+    const inputs: ActionInputs = {
+      apiToken: 'token',
+      body: 'test',
+      publication: 'my-pub',
+      stage: true,
+    };
+    expect(inputs.publication).toBe('my-pub');
+    expect(inputs.stage).toBe(true);
   });
 
-  describe('SmartDefaults', () => {
-    it('should compile with required fields', () => {
-      const defaults: SmartDefaults = {
-        title: 'Auto-generated title',
-        body: 'Auto-generated body'
-      };
-      expect(defaults.title).toBe('Auto-generated title');
-    });
-
-    it('should compile with optional fields', () => {
-      const defaults: SmartDefaults = {
-        title: 'Release v1.0.0',
-        body: 'Release notes',
-        eventType: 'release',
-        changes: [{ id: 1 }, { id: 2 }]
-      };
-      expect(defaults.eventType).toBe('release');
-      expect(defaults.changes).toHaveLength(2);
-    });
+  it('WorkStateRequest should have flat structure', () => {
+    const request: WorkStateRequest = {
+      body: 'test',
+      publication: 'my-pub',
+      stage: true,
+      labels: ['a'],
+      relevantLinks: ['https://example.com'],
+      changes: [{ commits: { count: 5 } }],
+    };
+    expect(request.body).toBe('test');
+    expect(request).not.toHaveProperty('docRequest');
   });
 
-  describe('DocHolidayRequest', () => {
-    it('should compile with required fields', () => {
-      const request: DocHolidayRequest = {
-        docRequest: {
-          title: 'Test Doc',
-          body: 'Test body',
-          sourceConnection: 'github'
-        }
-      };
-      expect(request.docRequest.title).toBe('Test Doc');
-    });
-
-    it('should compile with all optional fields', () => {
-      const request: DocHolidayRequest = {
-        docRequest: {
-          title: 'Test Release',
-          body: 'Release notes',
-          sourceConnection: 'github',
-          publications: ['blog'],
-          labels: ['feature'],
-          comments: ['Great work!'],
-          relevantLinks: ['https://github.com'],
-          eventType: 'release',
-          changes: [{ sha: 'abc123' }]
-        }
-      };
-      expect(request.docRequest.eventType).toBe('release');
-      expect(request.docRequest.publications).toHaveLength(1);
-    });
-  });
-
-  describe('DocHolidayResponse', () => {
-    it('should compile with all required fields', () => {
-      const response: DocHolidayResponse = {
-        id: 'job-123',
-        orgId: 'org-456',
-        type: 'documentation',
-        state: 'requested'
-      };
-      expect(response.id).toBe('job-123');
-      expect(response.state).toBe('requested');
-    });
-
-    it('should accept all valid state values', () => {
-      const states: DocHolidayResponse['state'][] = ['requested', 'running', 'done', 'errored'];
-      states.forEach(state => {
-        const response: DocHolidayResponse = {
-          id: 'job-123',
-          orgId: 'org-456',
-          type: 'documentation',
-          state
-        };
-        expect(response.state).toBe(state);
-      });
-    });
-  });
-
-  describe('ActionOutputs', () => {
-    it('should compile with all required fields', () => {
-      const output: ActionOutputs = {
-        jobId: 'job-123',
-        jobState: 'done',
-        jobUrl: 'https://doc.holiday/jobs/123'
-      };
-      expect(output.jobId).toBe('job-123');
-      expect(output.jobState).toBe('done');
-      expect(output.jobUrl).toBe('https://doc.holiday/jobs/123');
-    });
+  it('WorkStateResponse should have all fields', () => {
+    const response: WorkStateResponse = {
+      id: 'ws-123',
+      jobId: 'job-123',
+      outId: 'out-123',
+      orgId: 'org-123',
+      status: 'running',
+      publicationId: 'pub-123',
+      connectionId: 'conn-123',
+      publicationName: 'my-pub',
+      triggerType: 'api',
+      operationType: 'docs-update',
+      createdAt: '2025-10-29T15:00:00Z',
+      updatedAt: '2025-10-29T15:01:00Z',
+      branch: 'doc-holiday/work-states',
+      title: 'Update docs',
+      summary: 'Updated docs',
+      outputUrl: 'output-url',
+      staged: true,
+      excludedFiles: ['README.md'],
+      entries: [
+        {
+          id: 'entry-1',
+          createdAt: '2025-10-29T15:00:00Z',
+          status: 'requested',
+          message: 'Created',
+        },
+      ],
+    };
+    expect(response.id).toBe('ws-123');
+    expect(response.entries).toHaveLength(1);
   });
 });

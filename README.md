@@ -4,9 +4,7 @@ Automatically generate release notes and documentation updates using [doc.holida
 
 ## Features
 
-- **Automatic Release Notes**: Automatically generates docs when releases are published
-- **Pull Request Documentation**: Automatically generates docs when PRs are merged
-- **Manual Mode**: Full control over all doc.holiday API parameters
+- **Automatic Documentation**: Generate docs from natural language requests
 - **Comprehensive Changeset Support**: All 8 changeset specification types from doc.holiday API
 - **Fire-and-Forget**: Non-blocking workflow execution
 - **Built-in Retry Logic**: Handles rate limits and network failures
@@ -21,10 +19,8 @@ Automatically generate release notes and documentation updates using [doc.holida
 
 ### 2. Add to Your Workflow
 
-**Automatic Release Notes:**
-
 ```yaml
-name: Generate Release Notes
+name: Generate Documentation
 on:
   release:
     types: [published]
@@ -33,82 +29,11 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: sandgardenhq/doc-holiday-action@v1.0.1
+      - uses: sandgardenhq/doc-holiday-action@v2
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-          event-type: release
-```
-
-**PR Merge Documentation:**
-
-```yaml
-name: Update Docs on Merge
-on:
-  pull_request:
-    types: [closed]
-    branches: [main]
-
-jobs:
-  docs:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: sandgardenhq/doc-holiday-action@v1.0.1
-        with:
-          api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-          event-type: merge
-```
-
-## Usage Modes
-
-### Release
-
-Automatically generates release notes when a GitHub release is published.
-
-```yaml
-- uses: sandgardenhq/doc-holiday-action@v1.0.1
-  with:
-    api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-    event-type: release
-```
-
-**Auto-detected:**
-- Title: `"Release notes for {tag_name}"`
-- Body: Release description
-- Changes: Commits in the release
-
-### Pull Request Merged
-
-Automatically generates documentation when a PR is merged.
-
-```yaml
-- uses: sandgardenhq/doc-holiday-action@v1.0.1
-  with:
-    api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-    event-type: merge
-```
-
-**Auto-detected:**
-- Title: `"Documentation for PR #{number}: {title}"`
-- Body: PR description
-- Changes: PR commits
-
-### Manual
-
-Complete control over all doc.holiday parameters.
-
-```yaml
-- uses: sandgardenhq/doc-holiday-action@v1.0.1
-  with:
-    api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-    title: "Weekly documentation update"
-    body: "Generate guides for recent user-facing changes"
-    commits-count: 10
-    publications: my-api-docs,user-guide
-    labels: weekly,automated
-    comments: |
-      Focus on breaking changes
-      Include migration examples
+          body: "Generate release notes for the latest release"
+          releases-count: 1
 ```
 
 ## Inputs
@@ -118,33 +43,20 @@ Complete control over all doc.holiday parameters.
 | Input | Description |
 |-------|-------------|
 | `api-token` | Doc.holiday API token (store in GitHub secrets) |
+| `body` | Natural language request describing what you want written |
 
-### Mode Selection
-
-| Input | Description | Default |
-|-------|-------------|---------|
-| `event-type` | Event type: `release`, `merge`, or `custom` | `custom` |
-
-### Manual Mode (required when `event-type` is `custom`)
+### Optional
 
 | Input | Description |
 |-------|-------------|
-| `title` | Job title |
-| `body` | Natural language request or commit specification |
-
-### Optional Configuration
-
-| Input | Description |
-|-------|-------------|
-| `publications` | Comma-separated publication names/IDs |
-| `source-connection` | Connection name/ID (defaults to `owner/repo`) |
+| `publication` | Publication ID or name |
+| `stage` | If true, work does not immediately result in an opened PR |
 | `labels` | Comma-separated labels |
-| `comments` | Additional instructions (multiline supported) |
 | `relevant-links` | Comma-separated URLs for context |
 
 ### Changeset Specification
 
-Specify changes explicitly (overrides body if provided). **Only one type can be used at a time.**
+Specify changes explicitly. **Only one type can be used at a time.**
 
 #### By Releases
 
@@ -228,30 +140,67 @@ tags-end: 'v1.1.0'
 
 | Output | Description |
 |--------|-------------|
-| `job-id` | Doc.holiday job ID |
-| `job-state` | Job state (typically `requested`) |
-| `job-url` | URL to view job in doc.holiday UI |
+| `id` | Work state ID |
+| `job-id` | Associated job ID |
+| `out-id` | Output identifier |
+| `org-id` | Organization ID |
+| `status` | Work state status (`requested`, `running`, `done`, `errored`) |
+| `publication-id` | Publication ID |
+| `connection-id` | Connection ID |
+| `publication-name` | Publication name |
+| `trigger-type` | Trigger type |
+| `operation-type` | Operation type |
+| `created-at` | Creation timestamp (RFC3339) |
+| `updated-at` | Last update timestamp (RFC3339) |
+| `branch` | Branch name |
+| `title` | Title |
+| `summary` | Summary |
+| `output-url` | Output URL |
+| `staged` | Whether the work state is staged |
+| `excluded-files` | JSON array of excluded file paths |
+| `entries` | JSON array of work history entries |
 
 ### Using Outputs
 
 ```yaml
-- name: Create Doc Holiday Job
+- name: Create Documentation
   id: doc-holiday
-  uses: your-username/doc-holiday-action@v1
+  uses: sandgardenhq/doc-holiday-action@v2
   with:
     api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-    title: "Update docs"
-    body: "Last 5 commits"
+    body: "Document the last 5 commits"
     commits-count: 5
 
-- name: Show Job Info
+- name: Show Work State Info
   run: |
-    echo "Job ID: ${{ steps.doc-holiday.outputs.job-id }}"
-    echo "Job State: ${{ steps.doc-holiday.outputs.job-state }}"
-    echo "View at: ${{ steps.doc-holiday.outputs.job-url }}"
+    echo "Work State ID: ${{ steps.doc-holiday.outputs.id }}"
+    echo "Status: ${{ steps.doc-holiday.outputs.status }}"
+    echo "Branch: ${{ steps.doc-holiday.outputs.branch }}"
+    echo "Output URL: ${{ steps.doc-holiday.outputs.output-url }}"
 ```
 
 ## Examples
+
+### PR Merge Documentation
+
+```yaml
+name: Update Docs on Merge
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  docs:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sandgardenhq/doc-holiday-action@v2
+        with:
+          api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
+          body: "Document changes from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+          publication: my-docs
+```
 
 ### Weekly Scheduled Updates
 
@@ -265,51 +214,23 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: sandgardenhq/doc-holiday-action@v1.0.1
+      - uses: sandgardenhq/doc-holiday-action@v2
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-          title: "Weekly docs update"
           body: "Document user-facing changes from the past week"
           commits-count: 50
           labels: weekly,automated
 ```
 
-### Manual Workflow Dispatch
+### Staged Work (No Immediate PR)
 
 ```yaml
-name: Generate Documentation
-on:
-  workflow_dispatch:
-    inputs:
-      commit_range:
-        description: 'Commit range (e.g., abc123..def456)'
-        required: true
-      publications:
-        description: 'Publications (comma-separated)'
-        required: false
-
-jobs:
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: sandgardenhq/doc-holiday-action@v1.0.1
-        with:
-          api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-          title: "Manual documentation request"
-          body: "Generate documentation for commits ${{ github.event.inputs.commit_range }}"
-          publications: ${{ github.event.inputs.publications }}
-```
-
-### Multiple Publications
-
-```yaml
-- uses: sandgardenhq/doc-holiday-action@v1.0.1
+- uses: sandgardenhq/doc-holiday-action@v2
   with:
     api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-    title: "Update all docs"
-    body: "Last release"
+    body: "Draft release notes for the next version"
     releases-count: 1
-    publications: api-docs,user-guide,changelog
+    stage: true
 ```
 
 ## Troubleshooting
@@ -323,30 +244,17 @@ jobs:
 2. Check token hasn't expired in doc.holiday settings
 3. Ensure you're passing the secret correctly: `${{ secrets.DOC_HOLIDAY_TOKEN }}`
 
-### Missing Title or Body (Manual Mode)
-
-**Problem:** `title is required when event-type is not set or is "custom"`
-
-**Solution:** In manual mode, both `title` and `body` are required:
-
-```yaml
-with:
-  api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
-  title: "Your title here"
-  body: "Your description here"
-```
-
 ### Multiple Changeset Types
 
-**Problem:** `Multiple changeset types specified: releases-count, commits-count. Only one type is allowed.`
+**Problem:** `Multiple changeset types specified. Only one type is allowed.`
 
 **Solution:** Use only ONE changeset specification type at a time:
 
 ```yaml
-# ✓ Good
+# Good
 commits-count: 10
 
-# ✗ Bad
+# Bad
 commits-count: 10
 releases-count: 2
 ```
@@ -383,14 +291,6 @@ npm run package
 ### Testing
 
 Test locally by creating a test repository with different workflow configurations.
-
-## Publishing to GitHub Marketplace
-
-1. Ensure repository is public
-2. Update `action.yml` with your name/organization
-3. Update README with your repository URLs
-4. Create a release with semantic version tag (e.g., `v1.0.0`)
-5. Publish to marketplace via release page
 
 ## License
 
