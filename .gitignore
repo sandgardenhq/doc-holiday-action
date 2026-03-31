@@ -31,3 +31,7 @@ coverage/
 
 # Worktrees
 .worktrees/
+
+# Planning docs
+VERIFICATION_PLAN.md
+docs/plans/
