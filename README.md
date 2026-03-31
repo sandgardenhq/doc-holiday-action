@@ -167,7 +167,7 @@ tags-end: 'v1.1.0'
 
 ### Using Outputs
 
-These outputs come from the created work state. They replace older job-oriented outputs such as job URL and job state.
+These outputs come from the created work state. They replace deprecated job-oriented outputs from the earlier Jobs API model.
 
 ```yaml
 - name: Create Documentation
@@ -268,10 +268,10 @@ jobs:
 ### v2 Migration Notes
 
 - Use `body` for the natural-language request.
-- Use `publication` instead of `publications`.
+- Use `publication` instead of the removed `publications` input.
 - Use `stage` when work should be prepared without immediately opening a PR.
 - Do not use removed v1 inputs such as `event-type`, `title`, `source-connection`, or `comments`.
-- Read work-state outputs such as `id`, `status`, `branch`, and `output-url` instead of deprecated job-oriented outputs.
+- Read work-state outputs such as `id`, `status`, `branch`, and `output-url` instead of deprecated Jobs API outputs.
 
 ### Authentication Error (401)
 
