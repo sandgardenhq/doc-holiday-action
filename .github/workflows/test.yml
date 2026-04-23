@@ -30,3 +30,11 @@ jobs:
 
       - name: Package
         run: npm run package
+
+      - name: Verify dist/ is up to date
+        run: |
+          if ! git diff --quiet --exit-code dist/; then
+            echo "::error::dist/ is out of date. Run 'npm run build && npm run package' and commit the result."
+            git diff dist/
+            exit 1
+          fi
