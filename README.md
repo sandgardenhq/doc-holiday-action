@@ -305,7 +305,7 @@ The action automatically retries with exponential backoff. If you see persistent
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 24+
 - npm
 
 ### Setup
