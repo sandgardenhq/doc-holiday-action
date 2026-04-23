@@ -21,6 +21,19 @@ Thumbs.db
 # Build
 *.log
 
+# tsc intermediates in dist/ (only the ncc-bundled outputs should be tracked:
+# dist/index.js, dist/index.js.map, dist/licenses.txt, dist/sourcemap-register.js)
+dist/*.d.ts
+dist/*.d.ts.map
+dist/api.js
+dist/api.js.map
+dist/changes.js
+dist/changes.js.map
+dist/inputs.js
+dist/inputs.js.map
+dist/types.js
+dist/types.js.map
+
 # Environment
 .env
 .env.local
