@@ -2,9 +2,9 @@
 import {
   ActionInputs,
   ChangesetInput,
-  WorkStateRequest,
-  WorkStateResponse,
-  WorkStateEntry,
+  ConversationRequest,
+  ConversationResponse,
+  ConversationEntry,
 } from '../src/types';
 
 describe('types', () => {
@@ -31,8 +31,8 @@ describe('types', () => {
     expect(inputs.stage).toBe(true);
   });
 
-  it('WorkStateRequest should have flat structure', () => {
-    const request: WorkStateRequest = {
+  it('ConversationRequest should have flat structure', () => {
+    const request: ConversationRequest = {
       body: 'test',
       publication: 'my-pub',
       stage: true,
@@ -44,8 +44,8 @@ describe('types', () => {
     expect(request).not.toHaveProperty('docRequest');
   });
 
-  it('WorkStateResponse should have all fields', () => {
-    const response: WorkStateResponse = {
+  it('ConversationResponse should have all fields', () => {
+    const response: ConversationResponse = {
       id: 'ws-123',
       jobId: 'job-123',
       outId: 'out-123',
@@ -58,7 +58,7 @@ describe('types', () => {
       operationType: 'docs-update',
       createdAt: '2025-10-29T15:00:00Z',
       updatedAt: '2025-10-29T15:01:00Z',
-      branch: 'doc-holiday/work-states',
+      branch: 'doc-holiday/conversations',
       title: 'Update docs',
       summary: 'Updated docs',
       outputUrl: 'output-url',

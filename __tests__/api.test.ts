@@ -1,6 +1,6 @@
 // __tests__/api.test.ts
-import { createWorkState } from '../src/api';
-import { WorkStateRequest, WorkStateResponse } from '../src/types';
+import { createConversation } from '../src/api';
+import { ConversationRequest, ConversationResponse } from '../src/types';
 import * as core from '@actions/core';
 
 jest.mock('@actions/core');
@@ -8,11 +8,11 @@ jest.mock('@actions/core');
 const mockFetch = jest.fn();
 global.fetch = mockFetch as any;
 
-const mockRequest: WorkStateRequest = {
+const mockRequest: ConversationRequest = {
   body: 'Test body',
 };
 
-const mockResponse: WorkStateResponse = {
+const mockResponse: ConversationResponse = {
   id: 'ws-0000000000001234',
   jobId: 'job-0000000000007118',
   outId: 'out-000000000000abcd',
@@ -25,7 +25,7 @@ const mockResponse: WorkStateResponse = {
   operationType: 'docs-update',
   createdAt: '2025-10-29T15:00:00Z',
   updatedAt: '2025-10-29T15:01:00Z',
-  branch: 'doc-holiday/work-states-api',
+  branch: 'doc-holiday/conversations-api',
   title: 'Update the API docs',
   summary: 'Replaces Jobs API references.',
   outputUrl: 'output-url-123',
@@ -36,7 +36,7 @@ const mockResponse: WorkStateResponse = {
       id: 'entry-0001',
       createdAt: '2025-10-29T15:00:00Z',
       status: 'requested',
-      message: 'Work state created',
+      message: 'Conversation created',
     },
   ],
 };
@@ -46,20 +46,20 @@ describe('api', () => {
     jest.clearAllMocks();
   });
 
-  describe('createWorkState', () => {
-    it('should POST to /api/v1/work_states/', async () => {
+  describe('createConversation', () => {
+    it('should POST to /api/v1/conversations/', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => mockResponse,
       });
 
-      const result = await createWorkState('test-token', mockRequest);
+      const result = await createConversation('test-token', mockRequest);
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.doc.holiday/api/v1/work_states/',
+        'https://api.doc.holiday/api/v1/conversations/',
         {
           method: 'POST',
           headers: {
@@ -72,7 +72,7 @@ describe('api', () => {
     });
 
     it('should include optional fields in request', async () => {
-      const fullRequest: WorkStateRequest = {
+      const fullRequest: ConversationRequest = {
         body: 'Test body',
         publication: 'my-pub',
         stage: true,
@@ -87,10 +87,10 @@ describe('api', () => {
         json: async () => mockResponse,
       });
 
-      await createWorkState('test-token', fullRequest);
+      await createConversation('test-token', fullRequest);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.doc.holiday/api/v1/work_states/',
+        'https://api.doc.holiday/api/v1/conversations/',
         expect.objectContaining({
           body: JSON.stringify(fullRequest),
         })
@@ -103,7 +103,7 @@ describe('api', () => {
         status: 401,
       });
 
-      await expect(createWorkState('bad-token', mockRequest)).rejects.toThrow(
+      await expect(createConversation('bad-token', mockRequest)).rejects.toThrow(
         'Authentication failed. Please check your api-token.'
       );
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -119,7 +119,7 @@ describe('api', () => {
           json: async () => mockResponse,
         });
 
-      const result = await createWorkState('test-token', mockRequest);
+      const result = await createConversation('test-token', mockRequest);
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledTimes(3);
@@ -134,7 +134,7 @@ describe('api', () => {
           json: async () => mockResponse,
         });
 
-      const result = await createWorkState('test-token', mockRequest);
+      const result = await createConversation('test-token', mockRequest);
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledTimes(2);
@@ -146,8 +146,8 @@ describe('api', () => {
         .mockResolvedValueOnce({ ok: false, status: 500, text: async () => 'Server error' })
         .mockResolvedValueOnce({ ok: false, status: 500, text: async () => 'Server error' });
 
-      await expect(createWorkState('test-token', mockRequest)).rejects.toThrow(
-        'Failed to create work state after 3 attempts'
+      await expect(createConversation('test-token', mockRequest)).rejects.toThrow(
+        'Failed to create conversation after 3 attempts'
       );
     });
 
@@ -160,7 +160,7 @@ describe('api', () => {
           json: async () => mockResponse,
         });
 
-      const result = await createWorkState('test-token', mockRequest);
+      const result = await createConversation('test-token', mockRequest);
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledTimes(2);
     });
