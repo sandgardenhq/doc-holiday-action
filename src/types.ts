@@ -24,7 +24,7 @@ export interface ChangesetInput {
   tagsEnd?: string;
 }
 
-export interface WorkStateRequest {
+export interface ConversationRequest {
   body: string;
   publication?: string;
   stage?: boolean;
@@ -33,14 +33,14 @@ export interface WorkStateRequest {
   changes?: any[];
 }
 
-export interface WorkStateEntry {
+export interface ConversationEntry {
   id: string;
   createdAt: string;
   status: string;
   message: string;
 }
 
-export interface WorkStateResponse {
+export interface ConversationResponse {
   id: string;
   jobId: string;
   outId: string;
@@ -59,5 +59,5 @@ export interface WorkStateResponse {
   outputUrl: string;
   staged: boolean;
   excludedFiles: string[];
-  entries: WorkStateEntry[];
+  entries: ConversationEntry[];
 }

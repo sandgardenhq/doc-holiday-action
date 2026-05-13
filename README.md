@@ -2,19 +2,19 @@
 
 Automatically generate release notes and documentation updates using [doc.holiday](https://doc.holiday).
 
-Version 2 uses the Work States API with a simplified input model centered on natural-language requests and expanded work-state outputs.
+Version 3 uses the Conversations API with a simplified input model centered on natural-language requests and expanded conversation outputs.
 
 ## Features
 
 - **Automatic Documentation**: Generate docs from natural language requests
-- **Work States API**: Create documentation work through the v2 Work States API model
+- **Conversations API**: Create documentation work through the v3 Conversations API model
 - **Comprehensive Changeset Support**: All 8 changeset specification types from doc.holiday API
 - **Fire-and-Forget**: Non-blocking workflow execution
 - **Built-in Retry Logic**: Handles rate limits and network failures
 
 ## Quick Start
 
-Doc Holiday Action v2 sends natural-language documentation requests to the Work States API. The main breaking change from v1 is the move away from the Jobs API, along with fewer required inputs and richer outputs.
+Doc Holiday Action v3 sends natural-language documentation requests to the Conversations API. The main breaking change from earlier versions is the move away from the Jobs API, along with fewer required inputs and richer outputs.
 
 ### 1. Get Your API Token
 
@@ -34,7 +34,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: sandgardenhq/doc-holiday-action@v2
+      - uses: sandgardenhq/doc-holiday-action@v3
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
           body: "Generate release notes for the latest release"
@@ -145,11 +145,11 @@ tags-end: 'v1.1.0'
 
 | Output | Description |
 |--------|-------------|
-| `id` | Work state ID |
+| `id` | Conversation ID |
 | `job-id` | Associated job ID |
 | `out-id` | Output identifier |
 | `org-id` | Organization ID |
-| `status` | Work state status (`requested`, `running`, `done`, `errored`) |
+| `status` | Conversation status (`requested`, `running`, `done`, `errored`) |
 | `publication-id` | Publication ID |
 | `connection-id` | Connection ID |
 | `publication-name` | Publication name |
@@ -161,26 +161,26 @@ tags-end: 'v1.1.0'
 | `title` | Title |
 | `summary` | Summary |
 | `output-url` | Output URL |
-| `staged` | Whether the work state is staged |
+| `staged` | Whether the conversation is staged |
 | `excluded-files` | JSON array of excluded file paths |
 | `entries` | JSON array of work history entries |
 
 ### Using Outputs
 
-These outputs come from the created work state. They replace deprecated job-oriented outputs from the earlier Jobs API model.
+These outputs come from the created conversation. They replace deprecated job-oriented outputs from the earlier Jobs API model.
 
 ```yaml
 - name: Create Documentation
   id: doc-holiday
-  uses: sandgardenhq/doc-holiday-action@v2
+  uses: sandgardenhq/doc-holiday-action@v3
   with:
     api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
     body: "Document the last 5 commits"
     commits-count: 5
 
-- name: Show Work State Info
+- name: Show Conversation Info
   run: |
-    echo "Work State ID: ${{ steps.doc-holiday.outputs.id }}"
+    echo "Conversation ID: ${{ steps.doc-holiday.outputs.id }}"
     echo "Status: ${{ steps.doc-holiday.outputs.status }}"
     echo "Branch: ${{ steps.doc-holiday.outputs.branch }}"
     echo "Output URL: ${{ steps.doc-holiday.outputs.output-url }}"
@@ -190,7 +190,7 @@ These outputs come from the created work state. They replace deprecated job-orie
 
 ### PR Merge Documentation
 
-GitHub event data can still be used in the workflow to build the `body` input explicitly, but v2 does not auto-detect or infer request fields from the event payload.
+GitHub event data can still be used in the workflow to build the `body` input explicitly, but v3 does not auto-detect or infer request fields from the event payload.
 
 ```yaml
 name: Update Docs on Merge
@@ -204,7 +204,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: sandgardenhq/doc-holiday-action@v2
+      - uses: sandgardenhq/doc-holiday-action@v3
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
           body: "Document changes from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
@@ -224,7 +224,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: sandgardenhq/doc-holiday-action@v2
+      - uses: sandgardenhq/doc-holiday-action@v3
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
           body: "Generate release notes for the latest release"
@@ -244,7 +244,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: sandgardenhq/doc-holiday-action@v2
+      - uses: sandgardenhq/doc-holiday-action@v3
         with:
           api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
           body: "Document user-facing changes from the past week"
@@ -255,7 +255,7 @@ jobs:
 ### Staged Work (No Immediate PR)
 
 ```yaml
-- uses: sandgardenhq/doc-holiday-action@v2
+- uses: sandgardenhq/doc-holiday-action@v3
   with:
     api-token: ${{ secrets.DOC_HOLIDAY_TOKEN }}
     body: "Draft release notes for the next version"
@@ -265,13 +265,13 @@ jobs:
 
 ## Troubleshooting
 
-### v2 Migration Notes
+### v3 Migration Notes
 
 - Use `body` for the natural-language request.
 - Use `publication` instead of the removed `publications` input.
 - Use `stage` when work should be prepared without immediately opening a PR.
 - Do not use removed v1 inputs such as `event-type`, `title`, `source-connection`, or `comments`.
-- Read work-state outputs such as `id`, `status`, `branch`, and `output-url` instead of deprecated Jobs API outputs.
+- Read conversation outputs such as `id`, `status`, `branch`, and `output-url` instead of deprecated Jobs API outputs.
 
 ### Authentication Error (401)
 

@@ -1,6 +1,6 @@
 // __tests__/index.test.ts
 import * as core from '@actions/core';
-import { ActionInputs, WorkStateRequest, WorkStateResponse } from '../src/types';
+import { ActionInputs, ConversationRequest, ConversationResponse } from '../src/types';
 
 jest.mock('@actions/core');
 jest.mock('../src/inputs');
@@ -9,15 +9,15 @@ jest.mock('../src/api');
 
 import { parseInputs } from '../src/inputs';
 import { buildChanges } from '../src/changes';
-import { createWorkState } from '../src/api';
+import { createConversation } from '../src/api';
 import { run } from '../src/index';
 
 const mockCore = core as jest.Mocked<typeof core>;
 const mockParseInputs = parseInputs as jest.MockedFunction<typeof parseInputs>;
 const mockBuildChanges = buildChanges as jest.MockedFunction<typeof buildChanges>;
-const mockCreateWorkState = createWorkState as jest.MockedFunction<typeof createWorkState>;
+const mockCreateConversation = createConversation as jest.MockedFunction<typeof createConversation>;
 
-const mockResponse: WorkStateResponse = {
+const mockResponse: ConversationResponse = {
   id: 'ws-0000000000001234',
   jobId: 'job-0000000000007118',
   outId: 'out-000000000000abcd',
@@ -30,7 +30,7 @@ const mockResponse: WorkStateResponse = {
   operationType: 'docs-update',
   createdAt: '2025-10-29T15:00:00Z',
   updatedAt: '2025-10-29T15:01:00Z',
-  branch: 'doc-holiday/work-states-api',
+  branch: 'doc-holiday/conversations-api',
   title: 'Update the API docs',
   summary: 'Replaces Jobs API references.',
   outputUrl: 'output-url-123',
@@ -41,7 +41,7 @@ const mockResponse: WorkStateResponse = {
       id: 'entry-0001',
       createdAt: '2025-10-29T15:00:00Z',
       status: 'requested',
-      message: 'Work state created',
+      message: 'Conversation created',
     },
   ],
 };
@@ -52,16 +52,16 @@ describe('index.ts - main orchestration', () => {
   });
 
   describe('basic flow', () => {
-    it('should create work state with minimal inputs', async () => {
+    it('should create conversation with minimal inputs', async () => {
       mockParseInputs.mockReturnValue({
         apiToken: 'test-token',
         body: 'Generate docs',
       });
-      mockCreateWorkState.mockResolvedValue(mockResponse);
+      mockCreateConversation.mockResolvedValue(mockResponse);
 
       await run();
 
-      expect(mockCreateWorkState).toHaveBeenCalledWith('test-token', {
+      expect(mockCreateConversation).toHaveBeenCalledWith('test-token', {
         body: 'Generate docs',
       });
 
@@ -77,7 +77,7 @@ describe('index.ts - main orchestration', () => {
       expect(mockCore.setOutput).toHaveBeenCalledWith('operation-type', 'docs-update');
       expect(mockCore.setOutput).toHaveBeenCalledWith('created-at', '2025-10-29T15:00:00Z');
       expect(mockCore.setOutput).toHaveBeenCalledWith('updated-at', '2025-10-29T15:01:00Z');
-      expect(mockCore.setOutput).toHaveBeenCalledWith('branch', 'doc-holiday/work-states-api');
+      expect(mockCore.setOutput).toHaveBeenCalledWith('branch', 'doc-holiday/conversations-api');
       expect(mockCore.setOutput).toHaveBeenCalledWith('title', 'Update the API docs');
       expect(mockCore.setOutput).toHaveBeenCalledWith('summary', 'Replaces Jobs API references.');
       expect(mockCore.setOutput).toHaveBeenCalledWith('output-url', 'output-url-123');
@@ -97,11 +97,11 @@ describe('index.ts - main orchestration', () => {
         labels: ['docs', 'api'],
         relevantLinks: ['https://example.com'],
       });
-      mockCreateWorkState.mockResolvedValue(mockResponse);
+      mockCreateConversation.mockResolvedValue(mockResponse);
 
       await run();
 
-      expect(mockCreateWorkState).toHaveBeenCalledWith('test-token', {
+      expect(mockCreateConversation).toHaveBeenCalledWith('test-token', {
         body: 'Generate docs',
         publication: 'my-pub',
         stage: true,
@@ -120,12 +120,12 @@ describe('index.ts - main orchestration', () => {
         changeset: { commitsCount: 5 },
       });
       mockBuildChanges.mockReturnValue(mockChanges);
-      mockCreateWorkState.mockResolvedValue(mockResponse);
+      mockCreateConversation.mockResolvedValue(mockResponse);
 
       await run();
 
       expect(mockBuildChanges).toHaveBeenCalledWith({ commitsCount: 5 });
-      expect(mockCreateWorkState).toHaveBeenCalledWith('test-token', {
+      expect(mockCreateConversation).toHaveBeenCalledWith('test-token', {
         body: 'Generate docs',
         changes: mockChanges,
       });
@@ -138,11 +138,11 @@ describe('index.ts - main orchestration', () => {
         changeset: { commitsCount: 5 },
       });
       mockBuildChanges.mockReturnValue([]);
-      mockCreateWorkState.mockResolvedValue(mockResponse);
+      mockCreateConversation.mockResolvedValue(mockResponse);
 
       await run();
 
-      const callArgs = mockCreateWorkState.mock.calls[0][1];
+      const callArgs = mockCreateConversation.mock.calls[0][1];
       expect(callArgs).not.toHaveProperty('changes');
     });
 
@@ -151,7 +151,7 @@ describe('index.ts - main orchestration', () => {
         apiToken: 'test-token',
         body: 'Generate docs',
       });
-      mockCreateWorkState.mockResolvedValue(mockResponse);
+      mockCreateConversation.mockResolvedValue(mockResponse);
 
       await run();
 
@@ -166,15 +166,15 @@ describe('index.ts - main orchestration', () => {
       await run();
 
       expect(mockCore.setFailed).toHaveBeenCalledWith('Invalid inputs');
-      expect(mockCreateWorkState).not.toHaveBeenCalled();
+      expect(mockCreateConversation).not.toHaveBeenCalled();
     });
 
-    it('should call setFailed when createWorkState throws', async () => {
+    it('should call setFailed when createConversation throws', async () => {
       mockParseInputs.mockReturnValue({
         apiToken: 'test-token',
         body: 'Generate docs',
       });
-      mockCreateWorkState.mockRejectedValue(new Error('API request failed'));
+      mockCreateConversation.mockRejectedValue(new Error('API request failed'));
 
       await run();
 
@@ -186,7 +186,7 @@ describe('index.ts - main orchestration', () => {
         apiToken: 'test-token',
         body: 'Generate docs',
       });
-      mockCreateWorkState.mockRejectedValue('string error');
+      mockCreateConversation.mockRejectedValue('string error');
 
       await run();
 

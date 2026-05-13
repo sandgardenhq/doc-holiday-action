@@ -1,22 +1,22 @@
 // src/api.ts
 import * as core from '@actions/core';
-import { WorkStateRequest, WorkStateResponse } from './types';
+import { ConversationRequest, ConversationResponse } from './types';
 
 const API_BASE_URL = 'https://api.doc.holiday';
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY = 1000;
 
-export async function createWorkState(
+export async function createConversation(
   apiToken: string,
-  request: WorkStateRequest
-): Promise<WorkStateResponse> {
-  const url = `${API_BASE_URL}/api/v1/work_states/`;
+  request: ConversationRequest
+): Promise<ConversationResponse> {
+  const url = `${API_BASE_URL}/api/v1/conversations/`;
 
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      core.info(`Attempting to create work state (attempt ${attempt}/${MAX_RETRIES})...`);
+      core.info(`Attempting to create conversation (attempt ${attempt}/${MAX_RETRIES})...`);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -47,8 +47,8 @@ export async function createWorkState(
         );
       }
 
-      const data = await response.json() as WorkStateResponse;
-      core.info(`Work state created successfully: ${data.id}`);
+      const data = await response.json() as ConversationResponse;
+      core.info(`Conversation created successfully: ${data.id}`);
       return data;
     } catch (error) {
       lastError = error as Error;
@@ -66,7 +66,7 @@ export async function createWorkState(
   }
 
   throw new Error(
-    `Failed to create work state after ${MAX_RETRIES} attempts: ${lastError?.message}`
+    `Failed to create conversation after ${MAX_RETRIES} attempts: ${lastError?.message}`
   );
 }
 

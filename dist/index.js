@@ -40,18 +40,18 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createWorkState = createWorkState;
+exports.createConversation = createConversation;
 // src/api.ts
 const core = __importStar(__nccwpck_require__(7484));
 const API_BASE_URL = 'https://api.doc.holiday';
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY = 1000;
-async function createWorkState(apiToken, request) {
-    const url = `${API_BASE_URL}/api/v1/work_states/`;
+async function createConversation(apiToken, request) {
+    const url = `${API_BASE_URL}/api/v1/conversations/`;
     let lastError = null;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-            core.info(`Attempting to create work state (attempt ${attempt}/${MAX_RETRIES})...`);
+            core.info(`Attempting to create conversation (attempt ${attempt}/${MAX_RETRIES})...`);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -74,7 +74,7 @@ async function createWorkState(apiToken, request) {
                 throw new Error(`Doc.holiday API error (${response.status}): ${errorText}`);
             }
             const data = await response.json();
-            core.info(`Work state created successfully: ${data.id}`);
+            core.info(`Conversation created successfully: ${data.id}`);
             return data;
         }
         catch (error) {
@@ -89,7 +89,7 @@ async function createWorkState(apiToken, request) {
             }
         }
     }
-    throw new Error(`Failed to create work state after ${MAX_RETRIES} attempts: ${lastError?.message}`);
+    throw new Error(`Failed to create conversation after ${MAX_RETRIES} attempts: ${lastError?.message}`);
 }
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -235,8 +235,8 @@ async function run() {
                 core.info('Changeset specification added to request');
             }
         }
-        core.info('Creating work state...');
-        const response = await (0, api_1.createWorkState)(inputs.apiToken, request);
+        core.info('Creating conversation...');
+        const response = await (0, api_1.createConversation)(inputs.apiToken, request);
         // Set all outputs
         core.setOutput('id', response.id);
         core.setOutput('job-id', response.jobId);
@@ -258,7 +258,7 @@ async function run() {
         core.setOutput('excluded-files', JSON.stringify(response.excludedFiles));
         core.setOutput('entries', JSON.stringify(response.entries));
         core.info('Action completed successfully!');
-        core.info(`Work State ID: ${response.id}`);
+        core.info(`Conversation ID: ${response.id}`);
         core.info(`Status: ${response.status}`);
     }
     catch (error) {
