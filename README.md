@@ -326,10 +326,6 @@ npm run build
 npm run package
 ```
 
-### Testing
-
-Test locally by creating a test repository with different workflow configurations.
-
 ## License
 
 MIT License - see LICENSE file for details.
