@@ -16,13 +16,13 @@ A dog's paw includes several parts that work together to support balance, moveme
 
 ## What each part does
 
-- **Paw pads** cushion the foot, absorb shock, and protect against rough surfaces.
-- **Digital pads** support each toe and help maintain traction and balance.
-- **Metacarpal or metatarsal pad** carries weight and helps steady the paw during standing and walking.
-- **Claws or nails** help a dog grip the ground, dig, and gain extra stability.
-- **Dewclaw** can assist with grip, especially during turning or holding objects.
-- **Toes** help with balance, stepping, and adjusting to uneven terrain.
-- **Skin and fur between the toes** shield delicate skin, though this area needs regular checks because debris and moisture can collect there.
+- **Paw pads** absorb shock and protect the foot on rough surfaces.
+- **Digital pads** help a dog stay balanced and keep traction with each step.
+- **Metacarpal or metatarsal pad** supports body weight and steadies the paw.
+- **Claws or nails** help with gripping, digging, and added stability.
+- **Dewclaw** adds grip during some turns or when holding an object.
+- **Toes** spread and flex to support balance and movement on uneven ground.
+- **Skin and fur between the toes** protect delicate skin, but they can also trap moisture or debris.
 
 ## Common paw problems
 
@@ -35,7 +35,7 @@ A dog's paw includes several parts that work together to support balance, moveme
 - **Allergies or infections:** Repeated licking, redness, odor, swelling, or discharge can appear around the toes or nail beds. These signs matter because ongoing irritation can worsen and may need veterinary attention.
 - **Limping or swelling:** A dog may favor one paw, avoid activity, or react when the foot is touched. This matters because swelling or limping can point to a sprain, sting, foreign object, or other injury.
 
-## Practical paw-care tips
+## Practical paw care tips
 
 - Inspect the paws regularly for cuts, swelling, redness, debris, and changes in the nails or pads.
 - Trim nails carefully and in small amounts to avoid causing pain or bleeding.
